@@ -2,6 +2,9 @@ includes("@builtin/xpack")
 
 set_languages("cxxlatest")
 
+add_requires("libusb", { system = false })
+add_requires("libudev", { system = true })
+
 add_rules("mode.debug", "mode.release")
 
 if is_mode("debug") then
@@ -20,9 +23,20 @@ end
 target("simtracepp")
     -- TODO: Set version with `git describe`
     set_version("0.1.0")
+    set_license("LGPL-2.1")
     set_kind("static")
     add_includedirs("include", { public = true })
     add_files("src/**.cpp")
+    remove_files("src/usb.cpp")
+    add_packages("libusb", "libudev")
+    add_syslinks("usb-1.0", "udev")
+target_end()
+
+target("usb-test")
+    set_kind("binary")
+    add_files("src/usb.cpp")
+    add_deps("simtracepp")
+    set_default(true)
 target_end()
 
 xpack("simtracepp")
